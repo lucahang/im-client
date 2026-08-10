@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(Protobuf REQUIRED)
+find_package(redis++ REQUIRED)
 
-# proto 文件生成
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/message.proto)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -23,5 +23,6 @@ add_executable(im_client ${SOURCES})
 target_link_libraries(im_client
     Boost::system
     protobuf::libprotobuf
+    redis++
     pthread
 )

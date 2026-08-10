@@ -23,18 +23,17 @@ public:
              ReceiveCallback onRecv);
 
     void Connect();
-
-    // 发送任意消息（底层通用接口）
     void Send(const im::Message& msg);
 
-    // 高级业务接口：注册、登录、聊天
+    // 高级接口
     void RegisterUser(const std::string& username, const std::string& password);
     void LoginUser(const std::string& username, const std::string& password);
-    void SendChat(const std::string& receiver, const std::string& content);
+    void SendSingleMsg(const std::string& receiver, const std::string& content);
+    void SendGroupMsg(const std::string& group_id, const std::string& content);
+    void GetHistory(const std::string& peer_id, bool is_group, int64_t start, int32_t count);
+    void ClearUnread(const std::string& peer_id, bool is_group);
 
-    // 获取当前登录的用户ID（可能为空）
     std::optional<std::string> GetCurrentUserId() const;
-
     void Close();
 
 private:
@@ -56,7 +55,6 @@ private:
     std::mutex sendMutex_;
     bool writing_ = false;
 
-    // 客户端保存的序列号和当前用户ID
     int64_t seq_ = 0;
     std::optional<std::string> currentUserId_;
     mutable std::mutex userIdMutex_;

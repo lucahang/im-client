@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 
-// ---------- Codec 实现（同服务端） ----------
+// ---------- Codec ----------
 std::string Codec::Encode(const im::Message& msg) {
     std::string body = msg.SerializeAsString();
     int32_t netLen = htonl(static_cast<int32_t>(body.size()));
@@ -22,14 +22,12 @@ std::optional<im::Message> Codec::Decode(const char* data, size_t len) {
     return msg;
 }
 
-// ---------- IMClient 实现 ----------
+// ---------- IMClient ----------
 IMClient::IMClient(boost::asio::io_context& ioc,
                    const std::string& host, uint16_t port,
                    ReceiveCallback onRecv)
-    : socket_(ioc)
-    , resolver_(ioc)
-    , host_(host)
-    , port_(port)
+    : socket_(ioc), resolver_(ioc)
+    , host_(host), port_(port)
     , onReceive_(std::move(onRecv)) {}
 
 void IMClient::Connect() {
@@ -89,19 +87,51 @@ void IMClient::LoginUser(const std::string& username, const std::string& passwor
     Send(msg);
 }
 
-void IMClient::SendChat(const std::string& receiver, const std::string& content) {
-    if (!currentUserId_) {
-        std::cerr << "Error: Not logged in. Please login first.\n";
-        return;
-    }
+void IMClient::SendSingleMsg(const std::string& receiver, const std::string& content) {
+    if (!currentUserId_) { std::cerr << "Not logged in\n"; return; }
     im::Message msg;
-    msg.mutable_header()->set_cmd(im::CMD_CHAT_REQ);
+    msg.mutable_header()->set_cmd(im::CMD_SINGLE_MSG);
     msg.mutable_header()->set_seq(++seq_);
     im::ChatMessage chat;
-    chat.set_sender(*currentUserId_);   // 自动填充当前用户ID
     chat.set_receiver(receiver);
     chat.set_content(content);
     msg.set_body(chat.SerializeAsString());
+    Send(msg);
+}
+
+void IMClient::SendGroupMsg(const std::string& group_id, const std::string& content) {
+    if (!currentUserId_) { std::cerr << "Not logged in\n"; return; }
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_GROUP_MSG);
+    msg.mutable_header()->set_seq(++seq_);
+    im::ChatMessage chat;
+    chat.set_group_id(group_id);
+    chat.set_content(content);
+    msg.set_body(chat.SerializeAsString());
+    Send(msg);
+}
+
+void IMClient::GetHistory(const std::string& peer_id, bool is_group, int64_t start, int32_t count) {
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_GET_HISTORY_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+    im::HistoryRequest req;
+    req.set_peer_id(peer_id);
+    req.set_is_group(is_group);
+    req.set_start(start);
+    req.set_count(count);
+    msg.set_body(req.SerializeAsString());
+    Send(msg);
+}
+
+void IMClient::ClearUnread(const std::string& peer_id, bool is_group) {
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_CLEAR_UNREAD_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+    im::ClearUnreadRequest req;
+    req.set_peer_id(peer_id);
+    req.set_is_group(is_group);
+    msg.set_body(req.SerializeAsString());
     Send(msg);
 }
 
@@ -149,7 +179,6 @@ void IMClient::AsyncReadBody(int32_t bodyLen) {
 }
 
 void IMClient::OnMessageReceived(const im::Message& msg) {
-    // 特殊处理登录响应，保存用户ID
     if (msg.header().cmd() == im::CMD_LOGIN_RES && msg.header().status() == 0) {
         im::LoginResponse resp;
         if (resp.ParseFromString(msg.body())) {
@@ -157,7 +186,6 @@ void IMClient::OnMessageReceived(const im::Message& msg) {
             currentUserId_ = resp.user_id();
         }
     }
-    // 交给用户回调
     if (onReceive_) {
         onReceive_(msg);
     }
