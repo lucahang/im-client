@@ -1,3 +1,4 @@
+//im_client.cpp
 #include "im_client.h"
 #include <arpa/inet.h>
 #include <cstring>
@@ -211,6 +212,19 @@ void IMClient::DoWrite() {
             }
             DoWrite();
         });
+}
+
+void IMClient::Disconnect(){
+    if(!currentUserId_){ std::cerr << "Not logged in\n"; return;}
+    std::cout<<"Disconnecting..."<<std::endl;
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_QUIT_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+    //std::cout<<"currentUserId_.value(): "<<currentUserId_.value()<<std::endl;
+    msg.set_body(currentUserId_.value());
+    Send(msg);
+    currentUserId_=std::nullopt;
+    std::cout<<"Disconnected"<<std::endl;
 }
 
 void IMClient::Close() {

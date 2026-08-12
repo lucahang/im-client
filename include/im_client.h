@@ -1,3 +1,4 @@
+//im_client.h
 #pragma once
 #include <boost/asio.hpp>
 #include <deque>
@@ -32,6 +33,7 @@ public:
     void SendGroupMsg(const std::string& group_id, const std::string& content);
     void GetHistory(const std::string& peer_id, bool is_group, int64_t start, int32_t count);
     void ClearUnread(const std::string& peer_id, bool is_group);
+    void Disconnect();
 
     std::optional<std::string> GetCurrentUserId() const;
     void Close();

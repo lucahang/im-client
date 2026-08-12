@@ -1,9 +1,11 @@
+//main.cpp
 #include <boost/asio.hpp>
 #include <iostream>
 #include <string>
 #include <atomic>
 #include <thread>
 #include <sstream>
+
 #include "im_client.h"
 
 std::atomic<bool> g_running{true};
@@ -46,7 +48,7 @@ void OnReceive(const im::Message& msg) {
             std::cout << "[From " << chat.sender() << "] " << chat.content() << std::endl;
         }
     } else if (cmd == im::CMD_HEARTBEAT) {
-        // ignore
+        
     } else {
         std::cout << "[Unknown command " << cmd << "]" << std::endl;
     }
@@ -76,6 +78,7 @@ int main(int argc, char* argv[]) {
                   << "  gsend <group_id> <message>\n"
                   << "  history <peer_id> <is_group(0/1)> <start> <count>\n"
                   << "  clear <peer_id> <is_group(0/1)>\n"
+                  << "  disconnect\n"
                   << "  quit\n";
 
         std::string line;
@@ -119,9 +122,12 @@ int main(int argc, char* argv[]) {
                 iss >> peer >> is_grp;
                 if (!peer.empty()) client->ClearUnread(peer, is_grp);
                 else std::cout << "Usage: clear <peer> <is_group(0/1)>\n";
+            } else if(cmd == "disconnect"){
+                client->Disconnect();
             } else if (cmd == "quit") {
                 g_running = false; break;
             } else {
+                
                 std::cout << "Unknown command.\n";
             }
         }
