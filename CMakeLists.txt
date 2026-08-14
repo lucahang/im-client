@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(Protobuf REQUIRED)
+find_package(spdlog REQUIRED)
 find_package(redis++ REQUIRED)
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/message.proto)
@@ -16,6 +17,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(SOURCES
     src/main.cpp
     src/im_client.cpp
+    src/codec.cpp
     ${PROTO_SRCS}
 )
 
@@ -23,6 +25,7 @@ add_executable(im_client ${SOURCES})
 target_link_libraries(im_client
     Boost::system
     protobuf::libprotobuf
-    redis++
-    pthread
+    spdlog::spdlog
+    redis++::redis++
+    Threads::Threads
 )
