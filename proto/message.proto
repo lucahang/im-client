@@ -16,6 +16,20 @@ enum Cmd {
   CMD_CLEAR_UNREAD_RES   = 10;
   CMD_HEARTBEAT          = 11;
   CMD_QUIT_REQ           = 12;
+  CMD_QUIT_RES           = 13;
+  CMD_GET_CONTACTS_REQ   = 14;
+  CMD_GET_CONTACTS_RES   = 15;
+}
+
+message Contact {
+    string user_id = 1;
+    string username = 2;
+    bool is_group = 3;
+}
+
+message GetContactsResponse {
+    int32 status = 1;
+    repeated Contact contacts = 2;
 }
 
 message Header {
@@ -46,6 +60,7 @@ message LoginRequest {
 message LoginResponse {
   int32  status  = 1;
   string user_id = 2;
+  string username = 3;   // 确保存在
 }
 
 message ChatMessage {
