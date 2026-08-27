@@ -125,14 +125,14 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
         }
         case im::CMD_GET_CONTACTS_RES: {
             // 假设 proto 中定义了 GetContactsResponse
-            im::GetContactsResponse resp;
+            im::ContactResponse resp;
             if (resp.ParseFromString(msg.body())) {
                 QList<QPair<QString, QString>> contacts;
                 QList<bool> isGroupList;
                 for (int i = 0; i < resp.contacts_size(); ++i) {
                     const auto& c = resp.contacts(i);
                     contacts.append(qMakePair(QString::fromStdString(c.user_id()),
-                                              QString::fromStdString(c.username())));
+                                              QString::fromStdString(c.alias())));
                     isGroupList.append(c.is_group());
                 }
                 emit contactsReceived(contacts, isGroupList);

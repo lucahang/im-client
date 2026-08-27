@@ -15,6 +15,7 @@ public:
     void doRegister(const QString& username, const QString& password);
     void doLogin(const QString& username, const QString& password);
     void doSendMessage(const QString& receiverId, const QString& content, bool isGroup);
+    void doGetContacts();
     void doGetHistory(const QString& peerId, bool isGroup, int64_t start, int32_t count);
     void doClearUnread(const QString& peerId, bool isGroup);
     void doDisconnect();

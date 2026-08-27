@@ -43,7 +43,8 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
 void MainWindow::onContactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup) {
     contactList_->clear();
     for (int i = 0; i < contacts.size(); ++i) {
-        auto item = new QListWidgetItem(contacts[i].second + (isGroup[i] ? " (Group)" : ""));
+        QString displayName = contacts[i].second;
+        auto item = new QListWidgetItem(displayName + (isGroup[i] ? " (Group)" : ""));
         item->setData(Qt::UserRole, contacts[i].first);   // 存储 ID
         item->setData(Qt::UserRole + 1, isGroup[i]);
         contactList_->addItem(item);
@@ -86,7 +87,6 @@ void MainWindow::onContactClicked(QListWidgetItem* item) {
     } else {
         wrapper_->doGetHistory(peerId, isGroup, 0, 20);
     }
-
     // 清除未读（可选）
     wrapper_->doClearUnread(peerId, isGroup);
 }

@@ -140,7 +140,9 @@ void IMClient::GetContacts() {
     im::Message msg;
     msg.mutable_header()->set_cmd(im::CMD_GET_CONTACTS_REQ);  // 需在 proto 中定义
     msg.mutable_header()->set_seq(++seq_);
-    // 无 body
+    im::ContactRequest con;
+    con.set_user_id(currentUserId_.value());
+    msg.set_body(con.SerializeAsString());
     Send(msg);
 }
 
