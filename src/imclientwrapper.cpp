@@ -2,7 +2,7 @@
 #include <QMetaObject>
 #include <QThread>
 #include <iostream>
-
+#include <QDebug>
 IMClientWrapper::IMClientWrapper(const std::string& host, uint16_t port, QObject* parent)
     : QObject(parent), host_(host), port_(port) {
     // 设置网络回调
@@ -139,7 +139,18 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             }
             break;
         }
-        case im::CMD_SINGLE_MSG:
+        case im::CMD_SINGLE_MSG:{
+            im::ChatMessage chat;
+            if (chat.ParseFromString(msg.body())) {
+                QString sender = QString::fromStdString(chat.sender());
+                QString content = QString::fromStdString(chat.content());
+                bool isGroup = (cmd == im::CMD_GROUP_MSG);
+                QString groupId = "";
+                qDebug() << "receive CMD_SINGLE_MSG";
+                emit messageReceived(sender, content, isGroup, groupId);
+            }
+            break;
+        }
         case im::CMD_GROUP_MSG: {
             im::ChatMessage chat;
             if (chat.ParseFromString(msg.body())) {

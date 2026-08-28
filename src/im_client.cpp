@@ -94,6 +94,7 @@ void IMClient::SendSingleMsg(const std::string& receiver, const std::string& con
     msg.mutable_header()->set_cmd(im::CMD_SINGLE_MSG);
     msg.mutable_header()->set_seq(++seq_);
     im::ChatMessage chat;
+    chat.set_sender(*currentUserId_);
     chat.set_receiver(receiver);
     chat.set_content(content);
     msg.set_body(chat.SerializeAsString());

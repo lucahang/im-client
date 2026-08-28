@@ -5,6 +5,7 @@
 #include <QSplitter>
 #include <QListWidget>
 #include <QMessageBox>
+#include <QDebug>
 
 MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent)
     : QMainWindow(parent), wrapper_(wrapper) {
@@ -55,9 +56,13 @@ void MainWindow::onMessageReceived(const QString& sender, const QString& content
     QString peerId = isGroup ? groupId : sender;
     QString display = QString("[%1] %2").arg(sender).arg(content);
     messageCache_[peerId].append(display);
+    //qDebug()<<"currentPeer_: "<<currentPeer_<<"    peerId: "<<peerId;
+    //qDebug()<<"currentIsGroup_: "<<currentIsGroup_<<"    isGroup: "<<isGroup;
+    //qDebug()<<"display: "<<display;
 
     // 如果当前选中的就是这个联系人，则更新聊天显示
     if (currentPeer_ == peerId && currentIsGroup_ == isGroup) {
+        //qDebug()<<"update display...";
         chatWidget_->displayMessage(display);
     }
 }
@@ -81,12 +86,14 @@ void MainWindow::onContactClicked(QListWidgetItem* item) {
     chatWidget_->setPeer(peerId, isGroup);
     chatWidget_->setEnabled(true);
 
-    // 如果有缓存消息，显示；否则请求历史（默认获取最近20条）
-    if (messageCache_.contains(peerId)) {
-        chatWidget_->displayMessages(messageCache_[peerId]);
-    } else {
-        wrapper_->doGetHistory(peerId, isGroup, 0, 20);
-    }
+    // // 如果有缓存消息，显示；否则请求历史（默认获取最近20条）
+    // if (messageCache_.contains(peerId)) {
+    //     chatWidget_->displayMessages(messageCache_[peerId]);
+    // } else {
+    //     wrapper_->doGetHistory(peerId, isGroup, 0, 20);
+    // }
+    
+    wrapper_->doGetHistory(peerId, isGroup, 0, 20);
     // 清除未读（可选）
     wrapper_->doClearUnread(peerId, isGroup);
 }

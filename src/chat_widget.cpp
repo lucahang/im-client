@@ -38,7 +38,8 @@ void ChatWidget::displayMessage(const QString& msg) {
 
 void ChatWidget::displayMessages(const QList<QString>& msgs) {
     textDisplay_->clear();
-    for (const QString& m : msgs) {
+    for (int i = msgs.size() - 1; i >= 0; --i) {
+        auto m=msgs.at(i);
         textDisplay_->append(m);
     }
 }
@@ -47,5 +48,6 @@ void ChatWidget::onSendClicked() {
     QString content = inputEdit_->text().trimmed();
     if (content.isEmpty() || currentPeer_.isEmpty()) return;
     wrapper_->doSendMessage(currentPeer_, content, currentIsGroup_);
+    displayMessage(content);
     inputEdit_->clear();
 }
