@@ -18,6 +18,7 @@ public:
 
 private slots:
     void onSendMessageRequested(const QString& content);
+    void onLoadMoreHistoryRequested(const int & cnt);
 
 private:
     std::shared_ptr<IMClientWrapper> wrapper_;

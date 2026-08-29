@@ -17,6 +17,8 @@ private slots:
     void onContactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
     void onMessageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
     void onHistoryReceived(const QList<QPair<QString, QString> >& messages);
+    void onLoadMoreHistoryReceived(const QList<QPair<QString, QString>>& messages);
+    //void onLoadMoreHistoryRequested(const QList<QPair<QString, QString> >& messages);
     void onContactClicked(QListWidgetItem* item);
 
 private:

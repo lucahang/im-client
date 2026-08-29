@@ -29,6 +29,7 @@ signals:
     void contactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
     void messageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
     void historyReceived(const QList<QPair<QString,QString>>& messages);   // 实际可定义结构
+    void loadMoreHistoryReceived(const QList<QPair<QString,QString>>& messages);   // 实际可定义结构
     void clearUnreadResult(bool success);
     void disconnected();
     void errorOccurred(const QString& error);

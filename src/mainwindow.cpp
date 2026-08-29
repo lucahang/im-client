@@ -11,10 +11,10 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
     : QMainWindow(parent), wrapper_(wrapper) {
     setWindowTitle("IM Client");
 
-    resize(1000, 700);
+    resize(800, 500);
 
     // 【新增】设置允许缩放到的最小尺寸，防止拉得太小导致界面重叠
-    setMinimumSize(800, 500);
+    setMinimumSize(500, 300);
 
     // 创建联系人列表
     contactList_ = new QListWidget;
@@ -42,6 +42,9 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
             this, &MainWindow::onMessageReceived);
     connect(wrapper_.get(), &IMClientWrapper::historyReceived,
             this, &MainWindow::onHistoryReceived);
+    
+    connect(wrapper_.get(), &IMClientWrapper::loadMoreHistoryReceived,
+        this, &MainWindow::onLoadMoreHistoryReceived);
     connect(contactList_, &QListWidget::itemClicked,
             this, &MainWindow::onContactClicked);
 
@@ -83,6 +86,17 @@ void MainWindow::onHistoryReceived(const QList<QPair<QString, QString>>& message
     if (currentPeer_.isEmpty()) return;
     // 清空缓存并显示历史
     messageCache_[currentPeer_].clear();
+    for (const auto& line : messages) {
+        messageCache_[currentPeer_].append(line);
+    }
+    chatWidget_->displayMessages(messageCache_[currentPeer_]);
+}
+
+void MainWindow::onLoadMoreHistoryReceived(const QList<QPair<QString, QString>>& messages) {
+    qDebug()<<"onLoadMoreHistoryReceived function runs";
+    if (currentPeer_.isEmpty()) return;
+    // 清空缓存并显示历史
+    //messageCache_[currentPeer_].clear();
     for (const auto& line : messages) {
         messageCache_[currentPeer_].append(line);
     }

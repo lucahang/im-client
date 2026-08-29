@@ -175,6 +175,20 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             }
             break;
         }
+        case im::CMD_GET_LOADMORE_HISTORY_RES: {
+            im::HistoryResponse resp;
+            qDebug()<<"receive CMD_GET_LOADMORE_HISTORY_RES";
+            if (resp.ParseFromString(msg.body())) {
+                QList<QPair<QString, QString>> lines;
+                for (const auto& m : resp.messages()) {
+                    lines.append({QString("%1")
+                                 .arg(QString::fromStdString(m.content())),
+                                 QString::fromStdString(m.sender())});
+                }
+                emit loadMoreHistoryReceived(lines);
+            }
+            break;
+        }
         case im::CMD_CLEAR_UNREAD_RES: {
             emit clearUnreadResult(true);
             break;

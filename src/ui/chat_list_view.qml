@@ -4,9 +4,12 @@ import QtQuick.Layouts 1.15
 
 Item {
     id: root
-
+    // 拉取更多历史消息的信号
+    signal loadMoreHistoryRequested(int cnt)
     // 暴露给 C++ 调用的信号
     signal sendMessageRequested(string content)
+
+    
 
     ColumnLayout {
         anchors.fill: parent
@@ -21,11 +24,17 @@ Item {
             model: messageModel // C++ 端设置的 Context Property
             spacing: 8
 
+            property int lastCount: 0
+            property bool isLoadingMore: false
+            
             // 1. 数据增加时，延迟一帧滚动到底部（等待 Delegate 尺寸计算完毕）
             onCountChanged: {
-                Qt.callLater(function() {
-                    listView.positionViewAtEnd()
-                })
+                if(count == lastCount+1){
+                    Qt.callLater(function() {
+                        listView.positionViewAtEnd()
+                    })
+                }
+                lastCount = count
             }
 
             // 2. 窗口高度变化时，同样自动置底
@@ -34,6 +43,29 @@ Item {
                     listView.positionViewAtEnd()
                 })
             } // <--- 修复：这里之前漏掉了闭合括号
+
+            onContentYChanged: {
+                // contentY <= 0 说明已经滑动到了最顶端
+                if (contentY <= 0 && !isLoadingMore && count > 0) {
+                    console.log("触顶，触发加载更多历史消息...");
+                    isLoadingMore = true
+                    
+                    // 记录加载前列表的实际高度，用于加载完成后维持视口位置
+                    var oldContentHeight = listView.contentHeight
+                    
+                    // 触发信号通知 C++
+                    root.loadMoreHistoryRequested(count)
+
+                    // 使用 Qt.callLater 在 C++ 插入完数据并重新布局后调整 contentY
+                    Qt.callLater(function() {
+                        var newContentHeight = listView.contentHeight
+                        // 修正 contentY，保持视野停留在加载前的顶部位置
+                        listView.contentY = newContentHeight - oldContentHeight
+                        isLoadingMore = false
+                    })
+                }
+            }
+
 
             delegate: Rectangle {
                 width: listView.width

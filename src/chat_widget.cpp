@@ -34,7 +34,11 @@ ChatWidget::ChatWidget(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
                 
                 bool isConnected = connect(rootObj, SIGNAL(sendMessageRequested(QString)),
                                          this, SLOT(onSendMessageRequested(QString)));
-                qDebug() << "✅ 重新绑定状态:" << isConnected;
+                qDebug() << "sendMessageRequested ✅ 重新绑定状态:" << isConnected;
+                
+                isConnected = connect(rootObj, SIGNAL(loadMoreHistoryRequested(int)),
+                                         this, SLOT(onLoadMoreHistoryRequested(int)));
+                qDebug() << "loadMoreHistoryRequested ✅ 重新绑定状态:" << isConnected;
             }
         } else if (status == QQuickWidget::Error) {
             qDebug() << "❌ QML 加载报错:";
@@ -66,6 +70,14 @@ void ChatWidget::displayMessage(const QString& msg, bool isSelf) {
 void ChatWidget::displayMessages(const QList<QPair<QString, QString>>& msgs) {
     messageModel_->setMessages(msgs);
 }
+
+void ChatWidget::onLoadMoreHistoryRequested(const int& cnt){
+    qDebug()<<"onLoadMoreHistoryRequested function runs";
+    if (currentPeer_.isEmpty()) return;
+
+    wrapper_->doGetHistory(currentPeer_, currentIsGroup_, cnt, 10);
+}
+
 
 void ChatWidget::onSendMessageRequested(const QString& content) {
     qDebug()<<"onSendMessageRequested function runs";
