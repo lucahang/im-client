@@ -16,14 +16,14 @@ public:
 private slots:
     void onContactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
     void onMessageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
-    void onHistoryReceived(const QList<QString>& messages);
+    void onHistoryReceived(const QList<QPair<QString, QString> >& messages);
     void onContactClicked(QListWidgetItem* item);
 
 private:
     std::shared_ptr<IMClientWrapper> wrapper_;
     QListWidget* contactList_;
     ChatWidget* chatWidget_;
-    QMap<QString, QList<QString>> messageCache_;   // peerId -> messages
+    QMap<QString, QList<QPair<QString, QString> >> messageCache_;   // peerId -> messages
     QString currentPeer_;
     bool currentIsGroup_;
 };

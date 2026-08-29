@@ -20,13 +20,15 @@ public:
     void doClearUnread(const QString& peerId, bool isGroup);
     void doDisconnect();
 
+    std::string getCurrentUserId(){return *currentUserId_;}
+
 signals:
     // 这些信号在主线程中触发（通过 Qt 自动排队）
     void registerResult(bool success, int status, const QString& message);
     void loginResult(bool success, int status, const QString& userId, const QString& username);
     void contactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
     void messageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
-    void historyReceived(const QList<QString>& messages);   // 实际可定义结构
+    void historyReceived(const QList<QPair<QString,QString>>& messages);   // 实际可定义结构
     void clearUnreadResult(bool success);
     void disconnected();
     void errorOccurred(const QString& error);

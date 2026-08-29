@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <!-- 使用 ../ui/ 定位到 src/ui/chat_list_view.qml -->
+        <file alias="ui/chat_list_view.qml">../ui/chat_list_view.qml</file>
+    </qresource>
+</RCC>

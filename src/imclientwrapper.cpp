@@ -165,12 +165,11 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
         case im::CMD_GET_HISTORY_RES: {
             im::HistoryResponse resp;
             if (resp.ParseFromString(msg.body())) {
-                QList<QString> lines;
+                QList<QPair<QString, QString>> lines;
                 for (const auto& m : resp.messages()) {
-                    lines.append(QString("[%1] %2: %3")
-                                 .arg(m.msg_id())
-                                 .arg(QString::fromStdString(m.sender()))
-                                 .arg(QString::fromStdString(m.content())));
+                    lines.append({QString("%1")
+                                 .arg(QString::fromStdString(m.content())),
+                                 QString::fromStdString(m.sender())});
                 }
                 emit historyReceived(lines);
             }

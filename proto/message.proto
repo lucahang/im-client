@@ -69,10 +69,11 @@ message LoginResponse {
 }
 
 message ChatMessage {
-  string sender   = 1;
-  string receiver = 2;
-  string group_id = 3;
-  string content  = 4;
+  string sender     = 1;
+  string receiver   = 2;
+  string group_id   = 3;
+  string content    = 4;
+  string timestamp  = 5;
 }
 
 message HistoryRequest {
