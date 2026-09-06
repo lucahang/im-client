@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "imclientwrapper.h"
+#include "add_contacts_dialog.h"
 #include "chat_widget.h"
 #include <QVBoxLayout>
 #include <QSplitter>
@@ -15,28 +16,52 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
     // 【新增】设置允许缩放到的最小尺寸，防止拉得太小导致界面重叠
     setMinimumSize(500, 300);
     
+    QWidget* leftWidget = new QWidget;
+    QVBoxLayout* leftLayout =
+            new QVBoxLayout(leftWidget);
+    // 添加好友按钮
+    addButton_ = new QPushButton("+");
+    addButton_->setFixedSize(40,40);
     //this->setAttribute(Qt::WA_DeleteOnClose);
     
     // 创建联系人列表
     contactList_ = new QListWidget;
     contactList_->setMinimumWidth(100);
+    
+    leftLayout->addWidget(
+            addButton_,
+            0,
+            Qt::AlignCenter
+    );
+
+
+    leftLayout->addWidget(
+            contactList_
+    );
+
+
+    leftWidget->setLayout(
+            leftLayout
+    );
 
     // 创建聊天区域
     chatWidget_ = new ChatWidget(wrapper);
 
     // 分割布局
     auto splitter = new QSplitter(Qt::Horizontal);
-    splitter->addWidget(contactList_);
+    splitter->addWidget(leftWidget);
     splitter->addWidget(chatWidget_);
 
-    splitter->setStretchFactor(0, 1);
-    splitter->setStretchFactor(1, 4);
+    splitter->setStretchFactor(0, 0); 
+    splitter->setStretchFactor(1, 1); 
 
     // 3. 【核心】设置初始大小比例（比如：左边 200px，右边 600px）
     splitter->setSizes(QList<int>() << 200 << 600);
     setCentralWidget(splitter);
 
     // 连接信号
+    connect(addButton_, &QPushButton::clicked,
+            this,&MainWindow::showAddFriendDialog);
     connect(wrapper_.get(), &IMClientWrapper::contactsReceived,
             this, &MainWindow::onContactsReceived);
     connect(wrapper_.get(), &IMClientWrapper::messageReceived,
@@ -53,6 +78,14 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
 
     // 默认禁用聊天区域（未选联系人）
     chatWidget_->setEnabled(false);
+}
+
+void MainWindow::showAddFriendDialog(){
+    AddFriendDialog* dialog =
+        new AddFriendDialog(this);
+    // connect(dialog, &AddFriendDialog::addFriendRequest,
+    //     this,&MainWindow::sendAddFriendRequest);
+    dialog->exec();
 }
 
 MainWindow::~MainWindow(){

@@ -38,6 +38,7 @@ void MessageModel::appendMessage(const QString& msg, bool isSelf) {
     endInsertRows();
 }
 
+
 void MessageModel::setMessages(const QList<QPair<QString, QString>>& msgs) {
     beginResetModel();
     messages_.clear();

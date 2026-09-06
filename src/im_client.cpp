@@ -230,8 +230,8 @@ void IMClient::SendAddFriendReq(const std::string& target_id, const std::string&
     msg.mutable_header()->set_cmd(im::CMD_ADD_FRIEND_REQ);
     msg.mutable_header()->set_seq(++seq_);
     im::AddFriendRequest req;
-    req.set_from_user_id(std::stoi(*GetCurrentUserId()));
-    req.set_to_user_id(std::stoi(target_id));
+    req.set_from_user_id(*GetCurrentUserId());
+    req.set_to_user_id(target_id);
     req.set_message(m_msg);
     msg.set_body(req.SerializeAsString());
     Send(msg);

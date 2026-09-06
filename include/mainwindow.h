@@ -3,6 +3,7 @@
 #include <memory>
 #include <QList>
 #include <QPair>
+#include <QPushButton>
 #include <QString>
 #include <QListWidgetItem>
 class IMClientWrapper;
@@ -14,6 +15,7 @@ public:
     explicit MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent = nullptr);
     ~MainWindow();
 private slots:
+    void showAddFriendDialog();
     void onContactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
     void onMessageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
     void onHistoryReceived(const QList<QPair<QString, QString> >& messages);
@@ -31,4 +33,5 @@ private:
     QMap<QString, QList<QPair<QString, QString> >> messageCache_;   // peerId -> messages
     QString currentPeer_;
     bool currentIsGroup_;
+    QPushButton* addButton_;
 };
