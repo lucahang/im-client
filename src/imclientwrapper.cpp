@@ -37,6 +37,7 @@ void IMClientWrapper::startIoContext() {
 }
 
 void IMClientWrapper::stopIoContext() {
+    //qDebug("stopIoContext()");
     if (client_) {
         client_->Close();
     }

@@ -12,7 +12,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent = nullptr);
-
+    ~MainWindow();
 private slots:
     void onContactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
     void onMessageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
@@ -20,6 +20,9 @@ private slots:
     void onLoadMoreHistoryReceived(const QList<QPair<QString, QString>>& messages);
     //void onLoadMoreHistoryRequested(const QList<QPair<QString, QString> >& messages);
     void onContactClicked(QListWidgetItem* item);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     std::shared_ptr<IMClientWrapper> wrapper_;

@@ -225,6 +225,18 @@ void IMClient::DoWrite() {
         });
 }
 
+void IMClient::SendAddFriendReq(const std::string& target_id, const std::string& m_msg){
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_ADD_FRIEND_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+    im::AddFriendRequest req;
+    req.set_from_user_id(std::stoi(*GetCurrentUserId()));
+    req.set_to_user_id(std::stoi(target_id));
+    req.set_message(m_msg);
+    msg.set_body(req.SerializeAsString());
+    Send(msg);
+}
+
 void IMClient::Disconnect(){
     if(!currentUserId_){ std::cerr << "Not logged in\n"; return;}
     std::cout<<"Disconnecting..."<<std::endl;

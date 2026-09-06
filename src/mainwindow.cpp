@@ -10,12 +10,13 @@
 MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent)
     : QMainWindow(parent), wrapper_(wrapper) {
     setWindowTitle("IM Client");
-
     resize(800, 500);
-
+    
     // 【新增】设置允许缩放到的最小尺寸，防止拉得太小导致界面重叠
     setMinimumSize(500, 300);
-
+    
+    //this->setAttribute(Qt::WA_DeleteOnClose);
+    
     // 创建联系人列表
     contactList_ = new QListWidget;
     contactList_->setMinimumWidth(100);
@@ -42,7 +43,6 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
             this, &MainWindow::onMessageReceived);
     connect(wrapper_.get(), &IMClientWrapper::historyReceived,
             this, &MainWindow::onHistoryReceived);
-    
     connect(wrapper_.get(), &IMClientWrapper::loadMoreHistoryReceived,
         this, &MainWindow::onLoadMoreHistoryReceived);
     connect(contactList_, &QListWidget::itemClicked,
@@ -53,6 +53,16 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
 
     // 默认禁用聊天区域（未选联系人）
     chatWidget_->setEnabled(false);
+}
+
+MainWindow::~MainWindow(){
+
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    // 此时窗口和所有成员变量依然完整存在
+    wrapper_->doDisconnect();
+    event->accept(); // 正常接受关闭事件
 }
 
 void MainWindow::onContactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup) {
@@ -93,7 +103,7 @@ void MainWindow::onHistoryReceived(const QList<QPair<QString, QString>>& message
 }
 
 void MainWindow::onLoadMoreHistoryReceived(const QList<QPair<QString, QString>>& messages) {
-    qDebug()<<"onLoadMoreHistoryReceived function runs";
+    // qDebug()<<"onLoadMoreHistoryReceived function runs";
     if (currentPeer_.isEmpty()) return;
     // 清空缓存并显示历史
     //messageCache_[currentPeer_].clear();

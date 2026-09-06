@@ -30,6 +30,7 @@ public:
     void LoginUser(const std::string& username, const std::string& password);
     void SendSingleMsg(const std::string& receiver, const std::string& content);
     void SendGroupMsg(const std::string& group_id, const std::string& content);
+    void SendAddFriendReq(const std::string& target_id, const std::string& msg);
     void GetHistory(const std::string& peer_id, bool is_group, int64_t start, int32_t count);
     void ClearUnread(const std::string& peer_id, bool is_group);
     void GetContacts();   // 新增：请求联系人列表
