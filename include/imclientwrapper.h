@@ -15,6 +15,7 @@ public:
     void doRegister(const QString& username, const QString& password);
     void doLogin(const QString& username, const QString& password);
     void doSendMessage(const QString& receiverId, const QString& content, bool isGroup);
+    void doSendAddFriendReq(const QString& target_name, const QString& msg);
     void doGetContacts();
     void doGetHistory(const QString& peerId, bool isGroup, int64_t start, int32_t count);
     void doClearUnread(const QString& peerId, bool isGroup);
@@ -24,6 +25,7 @@ public:
 
 signals:
     // 这些信号在主线程中触发（通过 Qt 自动排队）
+    void sendAddFriendResult(bool success, int status, const QString& target_name);
     void registerResult(bool success, int status, const QString& message);
     void loginResult(bool success, int status, const QString& userId, const QString& username);
     void contactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);

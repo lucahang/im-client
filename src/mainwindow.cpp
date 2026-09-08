@@ -82,7 +82,7 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
 
 void MainWindow::showAddFriendDialog(){
     AddFriendDialog* dialog =
-        new AddFriendDialog(this);
+        new AddFriendDialog(wrapper_, this);
     // connect(dialog, &AddFriendDialog::addFriendRequest,
     //     this,&MainWindow::sendAddFriendRequest);
     dialog->exec();

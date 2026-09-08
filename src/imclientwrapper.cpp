@@ -64,6 +64,14 @@ void IMClientWrapper::doLogin(const QString& username, const QString& password) 
     });
 }
 
+void IMClientWrapper::doSendAddFriendReq(const QString& target_name, const QString& msg){
+    std::string t = target_name.toStdString();
+    std::string m = msg.toStdString();
+    boost::asio::post(ioc_, [this, t, m]() {
+        client_->SendAddFriendReq(t, m);
+    });
+}
+
 void IMClientWrapper::doSendMessage(const QString& receiverId, const QString& content, bool isGroup) {
     std::string rid = receiverId.toStdString();
     std::string cnt = content.toStdString();
@@ -163,6 +171,18 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             }
             break;
         }
+
+        case im::CMD_ADD_FRIEND_RES: {
+            im::AddFriendResponse resp;
+            if (resp.ParseFromString(msg.body())) {
+                bool ok = (resp.status() == 0);
+                emit sendAddFriendResult(ok, resp.status(), QString::fromStdString(resp.msg()));
+                //qDebug()<<"receive CMD_ADD_FRIEND_RES: "<<QString::fromStdString(resp.msg());
+            }
+            break;
+        }
+
+
         case im::CMD_GET_HISTORY_RES: {
             im::HistoryResponse resp;
             if (resp.ParseFromString(msg.body())) {
