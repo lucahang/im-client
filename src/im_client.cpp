@@ -225,6 +225,15 @@ void IMClient::DoWrite() {
         });
 }
 
+void IMClient::SendGetFriendReqsReq(){
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_GET_FRIEND_REQS_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+
+    Send(msg);
+}
+
+
 void IMClient::SendAddFriendReq(const std::string& target_name, const std::string& m_msg){
     im::Message msg;
     msg.mutable_header()->set_cmd(im::CMD_ADD_FRIEND_REQ);

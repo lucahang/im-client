@@ -68,6 +68,8 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
             this, &MainWindow::onMessageReceived);
     connect(wrapper_.get(), &IMClientWrapper::historyReceived,
             this, &MainWindow::onHistoryReceived);
+    // connect(wrapper_.get(), &IMClientWrapper::friendReqsReceived,
+    //         this, &MainWindow::onFriendReqsReceived);
     connect(wrapper_.get(), &IMClientWrapper::loadMoreHistoryReceived,
         this, &MainWindow::onLoadMoreHistoryReceived);
     connect(contactList_, &QListWidget::itemClicked,

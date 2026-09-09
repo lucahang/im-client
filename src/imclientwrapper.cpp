@@ -47,6 +47,12 @@ void IMClientWrapper::stopIoContext() {
     }
 }
 
+void IMClientWrapper::doSendGetFriendReqsReq(){
+    boost::asio::post(ioc_, [this]() {
+        client_->SendGetFriendReqsReq();
+    });
+}
+
 // ---------- 公开接口（线程安全，向 io_context 投递任务）----------
 void IMClientWrapper::doRegister(const QString& username, const QString& password) {
     std::string u = username.toStdString();
@@ -103,6 +109,8 @@ void IMClientWrapper::doDisconnect() {
     });
 }
 
+
+
 // ---------- 网络消息处理（在主线程执行）----------
 void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
     int cmd = msg.header().cmd();
@@ -148,6 +156,22 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             }
             break;
         }
+        case im::CMD_GET_FRIEND_REQS_RES: {
+            im::GetFriendRequestsResponse resp;
+            if (resp.ParseFromString(msg.body())){
+                QList<QVector<QString>> friendReqs;
+                for (int i = 0; i < resp.requests_size(); ++i) {
+                    const auto& r = resp.requests(i);
+                    QVector<QString> vec;
+                    vec.append(QString::fromStdString(r.to_user_id()));
+                    vec.append(QString::fromStdString(r.message()));
+                    vec.append(QString::fromStdString(std::to_string(r.status())));
+                    friendReqs.append(vec);
+                }
+                emit friendReqsReceived(friendReqs);
+            }
+            break;
+        }
         case im::CMD_SINGLE_MSG:{
             im::ChatMessage chat;
             if (chat.ParseFromString(msg.body())) {
@@ -177,7 +201,7 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             if (resp.ParseFromString(msg.body())) {
                 bool ok = (resp.status() == 0);
                 emit sendAddFriendResult(ok, resp.status(), QString::fromStdString(resp.msg()));
-                //qDebug()<<"receive CMD_ADD_FRIEND_RES: "<<QString::fromStdString(resp.msg());
+                // qDebug()<<"receive CMD_ADD_FRIEND_RES: "<<QString::fromStdString(resp.msg());
             }
             break;
         }

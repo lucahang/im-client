@@ -1,8 +1,10 @@
 #pragma once
 #include <QObject>
+#include <QVector>
 #include <memory>
 #include <thread>
 #include <optional>
+
 #include "im_client.h"
 
 class IMClientWrapper : public QObject {
@@ -18,6 +20,7 @@ public:
     void doSendAddFriendReq(const QString& target_name, const QString& msg);
     void doGetContacts();
     void doGetHistory(const QString& peerId, bool isGroup, int64_t start, int32_t count);
+    void doSendGetFriendReqsReq();
     void doClearUnread(const QString& peerId, bool isGroup);
     void doDisconnect();
 
@@ -35,6 +38,7 @@ signals:
     void clearUnreadResult(bool success);
     void disconnected();
     void errorOccurred(const QString& error);
+    void friendReqsReceived(const QList<QVector<QString>>& messages);
 
 private slots:
     void onNetworkMessage(const im::Message& msg);   // 在主线程执行

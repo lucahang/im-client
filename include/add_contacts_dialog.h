@@ -16,20 +16,12 @@ signals:
     void addFriendRequest(
         const QString& username
     );
-
-
-
 private slots:
-
-
     void onAddButtonClicked();
     void onSendAddFriendResult(bool success, int status, const QString& target_name);
-
-
 private:
     std::shared_ptr<IMClientWrapper> wrapper_;
     QLineEdit* usernameEdit_;
-
     QPushButton* addButton_;
 
 };

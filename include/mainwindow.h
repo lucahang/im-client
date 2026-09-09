@@ -3,6 +3,7 @@
 #include <memory>
 #include <QList>
 #include <QPair>
+#include <QVector>
 #include <QPushButton>
 #include <QString>
 #include <QListWidgetItem>

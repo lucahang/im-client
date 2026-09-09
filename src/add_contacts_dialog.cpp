@@ -31,8 +31,10 @@ AddFriendDialog::AddFriendDialog(std::shared_ptr<IMClientWrapper> wrapper, QWidg
         );
     QVBoxLayout* layout =
         new QVBoxLayout(this);
-    layout->addWidget(label);
-    layout->addWidget(usernameEdit_);
+    QHBoxLayout* hLayout = new QHBoxLayout(this);
+    hLayout->addWidget(label);
+    hLayout->addWidget(usernameEdit_);
+    layout->addLayout(hLayout);
     layout->addWidget(addButton_);
     setLayout(layout);
     connect(
@@ -59,6 +61,9 @@ void AddFriendDialog::onSendAddFriendResult(bool success, int status, const QStr
         }
         else if(status == 2){
             QMessageBox::warning(this, "Failed", "couldn't find user friend request failed");
+        }
+        else if(status == 3){
+            QMessageBox::warning(this, "Failed", "You couldn't send friend request to yourself");
         }
         else {
             QMessageBox::warning(this, "Failed", "sent friend request failed");

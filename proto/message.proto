@@ -23,6 +23,8 @@ enum Cmd {
   CMD_GET_LOADMORE_HISTORY_RES = 17;
   CMD_ADD_FRIEND_REQ     = 18;
   CMD_ADD_FRIEND_RES     = 19;
+  CMD_GET_FRIEND_REQS_REQ= 20;
+  CMD_GET_FRIEND_REQS_RES= 21;
 }
 
 message Contact {
@@ -84,6 +86,7 @@ message AddFriendResponse{
     int32 status = 1;   // 0 mean successfully sent friend request
                         // 1 mean already sent friend request before
                         // 2 mean couldn't find user with target_name 
+                        // 3 mean couldm't send firend request to yourself 
     string msg = 2;
 }
 
@@ -97,10 +100,10 @@ message FriendRequestInfo{
     string created_at = 6;
 }
 
-
 //获取申请列表
 message GetFriendRequestsResponse{
     repeated FriendRequestInfo requests = 1;
+    int32 status = 2;
 }
 
 message ChatMessage {
