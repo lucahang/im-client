@@ -225,6 +225,13 @@ void IMClient::DoWrite() {
         });
 }
 
+void IMClient::SendResponeToFriendReqsReq(const std::string& user_id, 
+                const std::string& peer_id, int32_t status){
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_GET_FRIEND_REQS_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+}
+
 void IMClient::SendGetFriendReqsReq(){
     im::Message msg;
     msg.mutable_header()->set_cmd(im::CMD_GET_FRIEND_REQS_REQ);
@@ -234,12 +241,13 @@ void IMClient::SendGetFriendReqsReq(){
 }
 
 
-void IMClient::SendAddFriendReq(const std::string& target_name, const std::string& m_msg){
+void IMClient::SendAddFriendReq(const std::string& target_name, const std::string& sender_name, const std::string& m_msg){
     im::Message msg;
     msg.mutable_header()->set_cmd(im::CMD_ADD_FRIEND_REQ);
     msg.mutable_header()->set_seq(++seq_);
     im::AddFriendRequest req;
     req.set_from_user_id(*GetCurrentUserId());
+    req.set_from_user_name(sender_name);
     req.set_to_user_name(target_name);
     req.set_message(m_msg);
     msg.set_body(req.SerializeAsString());

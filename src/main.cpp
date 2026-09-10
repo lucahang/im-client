@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <memory>
-#include "login_dialog.h"
-#include "mainwindow.h"
+#include "ui/login_dialog.h"
+#include "ui/mainwindow.h"
 #include "imclientwrapper.h"
 
 int main(int argc, char *argv[]) {

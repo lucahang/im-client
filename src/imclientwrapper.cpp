@@ -48,6 +48,7 @@ void IMClientWrapper::stopIoContext() {
 }
 
 void IMClientWrapper::doSendGetFriendReqsReq(){
+    qDebug()<<"doSendGetFriendReqsReq()";
     boost::asio::post(ioc_, [this]() {
         client_->SendGetFriendReqsReq();
     });
@@ -70,11 +71,12 @@ void IMClientWrapper::doLogin(const QString& username, const QString& password) 
     });
 }
 
-void IMClientWrapper::doSendAddFriendReq(const QString& target_name, const QString& msg){
+void IMClientWrapper::doSendAddFriendReq(const QString& target_name, const QString& sender_name, const QString& msg){
     std::string t = target_name.toStdString();
     std::string m = msg.toStdString();
-    boost::asio::post(ioc_, [this, t, m]() {
-        client_->SendAddFriendReq(t, m);
+    std::string s_n = sender_name.toStdString();
+    boost::asio::post(ioc_, [this, t, s_n, m]() {
+        client_->SendAddFriendReq(t, s_n, m);
     });
 }
 
@@ -109,7 +111,11 @@ void IMClientWrapper::doDisconnect() {
     });
 }
 
-
+// void IMClientWrapper::sendGetFriendReqsReq(){
+//     boost::asio::post(ioc_, [this]() {
+//         client_->SendGetFriendReqsReq();
+//     });
+// }
 
 // ---------- 网络消息处理（在主线程执行）----------
 void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
@@ -129,6 +135,7 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
                 bool ok = (resp.status() == 0);
                 QString userId = ok ? QString::fromStdString(resp.user_id()) : "";
                 QString username = ok ? QString::fromStdString(resp.username()) : "";
+                setCurrentUserName(username);
                 emit loginResult(ok, resp.status(), userId, username);
                 if (ok) {
                     currentUserId_ = resp.user_id();
@@ -164,8 +171,9 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
                     const auto& r = resp.requests(i);
                     QVector<QString> vec;
                     vec.append(QString::fromStdString(r.to_user_id()));
+                    vec.append(QString::fromStdString(r.sender_name()));
                     vec.append(QString::fromStdString(r.message()));
-                    vec.append(QString::fromStdString(std::to_string(r.status())));
+                    // vec.append(QString::fromStdString(std::to_string(r.status())));
                     friendReqs.append(vec);
                 }
                 emit friendReqsReceived(friendReqs);

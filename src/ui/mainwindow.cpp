@@ -1,7 +1,8 @@
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 #include "imclientwrapper.h"
-#include "add_contacts_dialog.h"
-#include "chat_widget.h"
+#include "ui/friendrequest_dialog.h"
+#include "ui/chat_widget.h"
+
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QListWidget>
@@ -12,6 +13,8 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
     : QMainWindow(parent), wrapper_(wrapper) {
     setWindowTitle("IM Client");
     resize(800, 500);
+
+    currentUserName_ = QString::fromStdString(wrapper_->getCurrentUserName());
     
     // 【新增】设置允许缩放到的最小尺寸，防止拉得太小导致界面重叠
     setMinimumSize(500, 300);
@@ -62,14 +65,15 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
     // 连接信号
     connect(addButton_, &QPushButton::clicked,
             this,&MainWindow::showAddFriendDialog);
+    // connect(addButton_, &QPushButton::clicked,
+    //         wrapper_.get(),&IMClientWrapper::doSendGetFriendReqsReq);
     connect(wrapper_.get(), &IMClientWrapper::contactsReceived,
             this, &MainWindow::onContactsReceived);
     connect(wrapper_.get(), &IMClientWrapper::messageReceived,
             this, &MainWindow::onMessageReceived);
     connect(wrapper_.get(), &IMClientWrapper::historyReceived,
             this, &MainWindow::onHistoryReceived);
-    // connect(wrapper_.get(), &IMClientWrapper::friendReqsReceived,
-    //         this, &MainWindow::onFriendReqsReceived);
+
     connect(wrapper_.get(), &IMClientWrapper::loadMoreHistoryReceived,
         this, &MainWindow::onLoadMoreHistoryReceived);
     connect(contactList_, &QListWidget::itemClicked,
@@ -83,9 +87,10 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
 }
 
 void MainWindow::showAddFriendDialog(){
-    AddFriendDialog* dialog =
-        new AddFriendDialog(wrapper_, this);
-    // connect(dialog, &AddFriendDialog::addFriendRequest,
+    wrapper_->doSendGetFriendReqsReq();
+    FriendRequestDialog* dialog =
+        new FriendRequestDialog(wrapper_, this);
+    // connect(dialog, &FriendRequestDialog::addFriendRequest,
     //     this,&MainWindow::sendAddFriendRequest);
     dialog->exec();
 }

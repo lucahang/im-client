@@ -4,6 +4,7 @@
 #include <memory>
 #include <thread>
 #include <optional>
+#include <string>
 
 #include "im_client.h"
 
@@ -17,13 +18,15 @@ public:
     void doRegister(const QString& username, const QString& password);
     void doLogin(const QString& username, const QString& password);
     void doSendMessage(const QString& receiverId, const QString& content, bool isGroup);
-    void doSendAddFriendReq(const QString& target_name, const QString& msg);
+    void doSendAddFriendReq(const QString& target_name, const QString& sender_name, const QString& msg);
     void doGetContacts();
     void doGetHistory(const QString& peerId, bool isGroup, int64_t start, int32_t count);
     void doSendGetFriendReqsReq();
     void doClearUnread(const QString& peerId, bool isGroup);
     void doDisconnect();
 
+    std::string getCurrentUserName(){return *currentUserName_;}
+    void setCurrentUserName(const QString& name){ currentUserName_ = name.toStdString();}
     std::string getCurrentUserId(){return *currentUserId_;}
 
 signals:
@@ -38,6 +41,7 @@ signals:
     void clearUnreadResult(bool success);
     void disconnected();
     void errorOccurred(const QString& error);
+    // void sendGetFriendReqsReq();
     void friendReqsReceived(const QList<QVector<QString>>& messages);
 
 private slots:
@@ -50,6 +54,7 @@ private:
     std::string host_;
     uint16_t port_;
     std::optional<std::string> currentUserId_;
+    std::optional<std::string> currentUserName_;
 
     void startIoContext();
     void stopIoContext();

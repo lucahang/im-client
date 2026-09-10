@@ -1,4 +1,4 @@
-#include "chat_widget.h"
+#include "ui/chat_widget.h"
 #include "imclientwrapper.h"
 #include "message_model.h"
 

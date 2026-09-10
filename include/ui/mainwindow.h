@@ -35,4 +35,5 @@ private:
     QString currentPeer_;
     bool currentIsGroup_;
     QPushButton* addButton_;
+    QString currentUserName_;
 };

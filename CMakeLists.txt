@@ -34,11 +34,12 @@ set(SOURCES
     src/main.cpp
     src/im_client.cpp
     src/imclientwrapper.cpp
-    src/login_dialog.cpp
-    src/mainwindow.cpp
-    src/chat_widget.cpp
+    src/ui/login_dialog.cpp
+    src/ui/mainwindow.cpp
+    src/ui/chat_widget.cpp
     src/message_model.cpp
-    src/add_contacts_dialog.cpp
+    src/ui/friendrequest_dialog.cpp
+    src/ui/friend_request_item.cpp
     # ⚠️ 确保这里的路径与 find 命令查到的实际路径完全一致
     src/others/resources.qrc 
     
@@ -46,13 +47,15 @@ set(SOURCES
 )
 
 set(HEADERS
-    include/mainwindow.h
-    include/login_dialog.h
-    include/chat_widget.h
+    include/ui/mainwindow.h
+    include/ui/login_dialog.h
+    include/ui/chat_widget.h
     include/imclientwrapper.h
     include/im_client.h
     include/message_model.h
-    include/add_contacts_dialog.h
+    include/ui/friendrequest_dialog.h
+    include/ui/friend_request_item.h
+
 )
 
 # 已开启 CMAKE_AUTORCC ON，不再需要额外的 ${RESOURCES} 变量

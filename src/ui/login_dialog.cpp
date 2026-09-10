@@ -1,5 +1,6 @@
-#include "login_dialog.h"
+#include "ui/login_dialog.h"
 #include "imclientwrapper.h"
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLineEdit>
