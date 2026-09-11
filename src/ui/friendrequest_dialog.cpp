@@ -196,6 +196,7 @@ FriendRequestDialog::FriendRequestDialog(std::shared_ptr<IMClientWrapper> wrappe
 }
 
 void FriendRequestDialog::onFriendReqsReceived(const QList<QVector<QString>>& messages){
+    requestList_->clear();
     for(const auto& message : messages){
         addRequestItem(
             message[1],
@@ -215,6 +216,7 @@ void FriendRequestDialog::addRequestItem(
         username,
         message,
         userId,
+        wrapper_,
         this
     );
 

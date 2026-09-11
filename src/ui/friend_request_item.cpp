@@ -1,4 +1,5 @@
 #include "ui/friend_request_item.h"
+#include "imclientwrapper.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -10,13 +11,43 @@ FriendRequestItem::FriendRequestItem(
     const QString& username,
     const QString& message,
     const QString& userId,
+    std::shared_ptr<IMClientWrapper>& wrapper,
     QWidget* parent)
     : QWidget(parent)
     , username_(username)
     , message_(message)
     , userId_(userId)
+    , wrapper_(wrapper)
 {
     setupUi();
+    connect(wrapper_.get(), &IMClientWrapper::clickReceive,
+            this, &FriendRequestItem::onClickReceive);
+}
+
+void FriendRequestItem::onAcceptClicked(){
+    acceptButton_->setEnabled(false);
+    wrapper_->doSendResponeToFriendReqsReq(userId_.toStdString(), 1);
+    wrapper_->doGetContacts();
+    wrapper_->doSendGetFriendReqsReq();
+}
+
+void FriendRequestItem::onRejectClicked(){
+    rejectButton_->setEnabled(false);
+    wrapper_->doSendResponeToFriendReqsReq(userId_.toStdString(), 2);
+    wrapper_->doSendGetFriendReqsReq();
+}
+
+void FriendRequestItem::onClickReceive(const int32_t status){
+    if(status == 1){
+        acceptButton_->setEnabled(true);
+        QString msg = QString("accept friend request sucessfully!");
+        qDebug()<<msg;
+    }
+    else if(status == 2){
+        QString msg = QString("reject friend request sucessfully!");
+        qDebug()<<msg;
+
+    }
 }
 
 void FriendRequestItem::setupUi()
@@ -151,13 +182,13 @@ void FriendRequestItem::setupUi()
         acceptButton_,
         &QPushButton::clicked,
         this,
-        &FriendRequestItem::acceptClicked
+        &FriendRequestItem::onAcceptClicked
     );
 
     connect(
         rejectButton_,
         &QPushButton::clicked,
         this,
-        &FriendRequestItem::rejectClicked
+        &FriendRequestItem::onRejectClicked
     );
 }

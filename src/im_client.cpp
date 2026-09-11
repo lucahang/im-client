@@ -228,8 +228,15 @@ void IMClient::DoWrite() {
 void IMClient::SendResponeToFriendReqsReq(const std::string& user_id, 
                 const std::string& peer_id, int32_t status){
     im::Message msg;
-    msg.mutable_header()->set_cmd(im::CMD_GET_FRIEND_REQS_REQ);
+    msg.mutable_header()->set_cmd(im::CMD_RESPONE_TO_FRIEND_REQS_REQ);
     msg.mutable_header()->set_seq(++seq_);
+
+    im::ResponseToFriendReqsReq req;
+    req.set_user_id(user_id);
+    req.set_peer_id(peer_id);
+    req.set_status(status);
+    msg.set_body(req.SerializeAsString());
+    Send(msg);
 }
 
 void IMClient::SendGetFriendReqsReq(){

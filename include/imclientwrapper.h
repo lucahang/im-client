@@ -22,6 +22,7 @@ public:
     void doGetContacts();
     void doGetHistory(const QString& peerId, bool isGroup, int64_t start, int32_t count);
     void doSendGetFriendReqsReq();
+    void doSendResponeToFriendReqsReq(const std::string& peer_id, int32_t status);
     void doClearUnread(const QString& peerId, bool isGroup);
     void doDisconnect();
 
@@ -41,6 +42,7 @@ signals:
     void clearUnreadResult(bool success);
     void disconnected();
     void errorOccurred(const QString& error);
+    void clickReceive(const int32_t status);
     // void sendGetFriendReqsReq();
     void friendReqsReceived(const QList<QVector<QString>>& messages);
 

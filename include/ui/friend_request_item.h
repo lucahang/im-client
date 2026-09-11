@@ -1,9 +1,10 @@
 #pragma once
 
 #include <QWidget>
-
+#include <memory>
 class QLabel;
 class QPushButton;
+class IMClientWrapper;
 
 class FriendRequestItem : public QWidget
 {
@@ -14,17 +15,21 @@ public:
         const QString& username,
         const QString& message,
         const QString& userId,
+        std::shared_ptr<IMClientWrapper>& wrapper,
         QWidget* parent = nullptr
     );
 
+    void onAcceptClicked();
+    void onRejectClicked();
+    void onClickReceive(const int32_t status);
 signals:
-    void acceptClicked();
-    void rejectClicked();
 
 private:
     void setupUi();
 
 private:
+    std::shared_ptr<IMClientWrapper> wrapper_;
+
     QString username_;
     QString userId_;
     QString message_;

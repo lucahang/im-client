@@ -47,8 +47,17 @@ void IMClientWrapper::stopIoContext() {
     }
 }
 
+// status == 1 mean accept  
+// status == 2 mean reject
+void IMClientWrapper::doSendResponeToFriendReqsReq(
+                const std::string& peer_id, int32_t status){
+    boost::asio::post(ioc_, [this, peer_id, status]() {
+        client_->SendResponeToFriendReqsReq(*currentUserId_, peer_id, status);
+    });
+}
+
 void IMClientWrapper::doSendGetFriendReqsReq(){
-    qDebug()<<"doSendGetFriendReqsReq()";
+    //qDebug()<<"doSendGetFriendReqsReq()";
     boost::asio::post(ioc_, [this]() {
         client_->SendGetFriendReqsReq();
     });
@@ -102,6 +111,12 @@ void IMClientWrapper::doClearUnread(const QString& peerId, bool isGroup) {
     std::string pid = peerId.toStdString();
     boost::asio::post(ioc_, [this, pid, isGroup]() {
         client_->ClearUnread(pid, isGroup);
+    });
+}
+
+void IMClientWrapper::doGetContacts(){
+    boost::asio::post(ioc_, [this]() {
+        client_->GetContacts();
     });
 }
 
@@ -170,7 +185,7 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
                 for (int i = 0; i < resp.requests_size(); ++i) {
                     const auto& r = resp.requests(i);
                     QVector<QString> vec;
-                    vec.append(QString::fromStdString(r.to_user_id()));
+                    vec.append(QString::fromStdString(r.from_user_id()));
                     vec.append(QString::fromStdString(r.sender_name()));
                     vec.append(QString::fromStdString(r.message()));
                     // vec.append(QString::fromStdString(std::to_string(r.status())));
@@ -248,6 +263,13 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
         }
         case im::CMD_QUIT_RES: {
             emit disconnected();
+            break;
+        }
+        case im::CMD_RESPONE_TO_FRIEND_REQS_RES: {
+            im::ResponseToFriendReqsRes resp;
+            if (resp.ParseFromString(msg.body())) {
+                emit clickReceive(resp.status());
+            }
             break;
         }
         default:
