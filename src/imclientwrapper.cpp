@@ -63,6 +63,13 @@ void IMClientWrapper::doSendGetFriendReqsReq(){
     });
 }
 
+void IMClientWrapper::doDeleteFriendReq(const QString& peer_id){
+    boost::asio::post(ioc_, [this, peer_id]() {
+        client_->DeleteFriendReq(peer_id.toStdString());
+    });
+}
+
+
 // ---------- 公开接口（线程安全，向 io_context 投递任务）----------
 void IMClientWrapper::doRegister(const QString& username, const QString& password) {
     std::string u = username.toStdString();
@@ -229,7 +236,14 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             break;
         }
 
-
+        case im::CMD_DELETE_FRIEND_RES: {
+            im::DeleteFriendRes resp;
+            if (resp.ParseFromString(msg.body())) {
+                qDebug()<<"receive CMD_DELETE_FRIEND_RES: ";
+                emit deleteFriendReceive(resp.status());
+            }
+            break;
+        }
         case im::CMD_GET_HISTORY_RES: {
             im::HistoryResponse resp;
             if (resp.ParseFromString(msg.body())) {

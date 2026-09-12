@@ -33,6 +33,7 @@ public:
     void SendAddFriendReq(const std::string& target_name, const std::string& sender_name,const std::string& msg);
     void GetHistory(const std::string& peer_id, bool is_group, int64_t start, int32_t count);
     void SendGetFriendReqsReq();
+    void DeleteFriendReq(const std::string& peer_id);
     void SendResponeToFriendReqsReq(const std::string& user_id, const std::string& peer_id, int32_t status);
     void ClearUnread(const std::string& peer_id, bool is_group);
     void GetContacts();   // 新增：请求联系人列表

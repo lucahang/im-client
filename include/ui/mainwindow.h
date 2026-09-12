@@ -23,6 +23,7 @@ private slots:
     void onLoadMoreHistoryReceived(const QList<QPair<QString, QString>>& messages);
     //void onLoadMoreHistoryRequested(const QList<QPair<QString, QString> >& messages);
     void onContactClicked(QListWidgetItem* item);
+    void onDeleteFriendReceive(const int32_t status);
 
 protected:
     void closeEvent(QCloseEvent *event) override;

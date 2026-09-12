@@ -27,6 +27,8 @@ enum Cmd {
   CMD_GET_FRIEND_REQS_RES= 21;
   CMD_RESPONE_TO_FRIEND_REQS_REQ = 22;
   CMD_RESPONE_TO_FRIEND_REQS_RES = 23;
+  CMD_DELETE_FRIEND_REQ  = 24;
+  CMD_DELETE_FRIEND_RES  = 25;
 }
 
 message Contact {
@@ -101,6 +103,14 @@ message AddFriendResponse{
                         // 2 mean couldn't find user with target_name 
                         // 3 mean couldm't send firend request to yourself 
     string msg = 2;
+}
+
+message DeleteFriendReq{
+  string peer_id = 1;
+}
+
+message DeleteFriendRes{
+  int32 status = 1;
 }
 
 //好友申请信息

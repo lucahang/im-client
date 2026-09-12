@@ -7,6 +7,7 @@
 #include <QSplitter>
 #include <QListWidget>
 #include <QMessageBox>
+#include <QMenu>
 #include <QDebug>
 
 MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent)
@@ -29,6 +30,37 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
     
     // 创建联系人列表
     contactList_ = new QListWidget;
+
+    // 设置右键菜单策略
+    contactList_->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(contactList_, &QListWidget::customContextMenuRequested,
+            this, [this](const QPoint& pos) {
+        // 找到右键点击的 item
+        QListWidgetItem* item = contactList_->itemAt(pos);
+        // 没有点击到元素
+        if (!item) {
+            return;
+        }
+        // 创建右键菜单
+        QMenu menu(this);
+        QAction* deleteAction = menu.addAction("Unfriend");
+        QAction* remarkAction = menu.addAction("Edit Remark");
+        // 弹出菜单
+        QAction* action = menu.exec(
+            contactList_->viewport()->mapToGlobal(pos)
+        );
+        QString peerId = item->data(Qt::UserRole).toString();
+        // 根据选择执行操作
+        if (action == deleteAction) {
+            wrapper_->doDeleteFriendReq(peerId);        
+            qDebug() << "Unfriend";
+        }
+        else if (action == remarkAction) {
+            qDebug() << "Edit Remark";
+        }
+    });
+
     contactList_->setMinimumWidth(100);
     
     leftLayout->addWidget(
@@ -78,7 +110,8 @@ MainWindow::MainWindow(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
         this, &MainWindow::onLoadMoreHistoryReceived);
     connect(contactList_, &QListWidget::itemClicked,
             this, &MainWindow::onContactClicked);
-
+    connect(wrapper_.get(), &IMClientWrapper::deleteFriendReceive,
+            this, &MainWindow::onDeleteFriendReceive);
     // 当断开连接时关闭窗口
     connect(wrapper_.get(), &IMClientWrapper::disconnected, this, &QMainWindow::close);
 
@@ -98,6 +131,17 @@ void MainWindow::showAddFriendDialog(){
 MainWindow::~MainWindow(){
 
 }
+
+void MainWindow::onDeleteFriendReceive(const int32_t status){
+    if(status == 0){
+        wrapper_->doGetContacts();
+        QMessageBox::information(this, "Success", "Delete successfully");
+    }
+    else if(status == 1){
+        QMessageBox::warning(this, "Failed", "delete error");
+    }
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     // 此时窗口和所有成员变量依然完整存在

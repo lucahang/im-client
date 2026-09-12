@@ -203,6 +203,17 @@ void IMClient::OnMessageReceived(const im::Message& msg) {
     }
 }
 
+void IMClient::DeleteFriendReq(const std::string& peer_id){
+    im::Message msg;
+    msg.mutable_header()->set_cmd(im::CMD_DELETE_FRIEND_REQ);
+    msg.mutable_header()->set_seq(++seq_);
+
+    im::DeleteFriendReq req;
+    req.set_peer_id(peer_id);
+    msg.set_body(req.SerializeAsString());
+    Send(msg);
+}
+
 void IMClient::DoWrite() {
     std::string data;
     {
