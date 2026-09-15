@@ -9,6 +9,8 @@
 struct ChatMessage {
     QString content;
     bool isSelf; // 可扩展字段，标识是否为自己发送
+    int32_t status;
+    QString msg_id;
 };
 
 class MessageModel : public QAbstractListModel {
@@ -16,7 +18,9 @@ class MessageModel : public QAbstractListModel {
 public:
     enum MessageRoles {
         ContentRole = Qt::UserRole + 1,
-        IsSelfRole
+        MessageIdRole,
+        IsSelfRole,
+        StatusRole
     };
 
     explicit MessageModel(QObject* parent = nullptr , std::shared_ptr<IMClientWrapper> wrapper= nullptr );
@@ -25,8 +29,10 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void appendMessage(const QString& msg, bool isSelf = true);
+    void appendMessage(const QString& msg, const QString& msg_unique_id, 
+                    bool isSelf = true, int32_t status = 0);
     void setMessages(const QList<QPair<QString, QString>>& msgs);
+    void setMsgStatus(const QString& peer_id, const QString& msg_unique_id, int32_t status);
     void clear();
 
 private:

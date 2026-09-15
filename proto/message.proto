@@ -29,6 +29,8 @@ enum Cmd {
   CMD_RESPONE_TO_FRIEND_REQS_RES = 23;
   CMD_DELETE_FRIEND_REQ  = 24;
   CMD_DELETE_FRIEND_RES  = 25;
+  CMD_MESSAGE_ACK        = 26;
+
 }
 
 message Contact {
@@ -136,6 +138,13 @@ message ChatMessage {
   string group_id   = 3;
   string content    = 4;
   string timestamp  = 5;
+  string msg_unique_id= 6;
+}
+
+message MessageACK{
+  string peer_id    = 1;
+  int32 status      = 2;
+  string msg_unique_id = 3;
 }
 
 message HistoryRequest {
@@ -152,6 +161,7 @@ message HistoryMessage {
   string group_id  = 4;
   string content   = 5;
   int64  timestamp = 6;
+  string msg_unique_id = 7;
 }
 
 message HistoryResponse {

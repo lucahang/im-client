@@ -7,30 +7,83 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QMessageBox>
+#include <QFont>
 
 LoginDialog::LoginDialog(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent)
     : QDialog(parent), wrapper_(wrapper) {
-    setWindowTitle("Login / Register");
 
+    setWindowTitle("Login / Register");
+    resize(350, 220);
+
+    // 用户名标签
+    QLabel* usernameLabel = new QLabel("Username:");
+    QLabel* passwordLabel = new QLabel("Password:");
+
+    QFont font("Arial", 16, QFont::Normal);
+
+    usernameLabel->setFont(font);
+    passwordLabel->setFont(font);
+
+
+    // 输入框
     usernameEdit_ = new QLineEdit;
     usernameEdit_->setPlaceholderText("Username");
+    usernameEdit_->setFixedHeight(35);
+    usernameEdit_->setFixedWidth(200);
+
     passwordEdit_ = new QLineEdit;
     passwordEdit_->setPlaceholderText("Password");
     passwordEdit_->setEchoMode(QLineEdit::Password);
+    passwordEdit_->setFixedHeight(35);
+    passwordEdit_->setFixedWidth(200);
 
+
+    // 标签宽度统一
+    usernameLabel->setFixedWidth(100);
+    passwordLabel->setFixedWidth(100);
+
+
+    // 按钮
     loginBtn_ = new QPushButton("Login");
     registerBtn_ = new QPushButton("Register");
 
-    auto layout = new QVBoxLayout;
-    layout->addWidget(new QLabel("Username:"));
-    layout->addWidget(usernameEdit_);
-    layout->addWidget(new QLabel("Password:"));
-    layout->addWidget(passwordEdit_);
+    loginBtn_->setFixedHeight(35);
+    registerBtn_->setFixedHeight(35);
 
+
+    // 用户名布局
+    auto usernameLayout = new QHBoxLayout;
+
+    usernameLayout->addWidget(usernameLabel);
+    usernameLayout->addWidget(usernameEdit_);
+
+
+    // 密码布局
+    auto passwordLayout = new QHBoxLayout;
+
+    passwordLayout->addWidget(passwordLabel);
+    passwordLayout->addWidget(passwordEdit_);
+
+
+    // 按钮布局
     auto hLayout = new QHBoxLayout;
+
+    hLayout->addStretch();   // 让按钮居中
     hLayout->addWidget(loginBtn_);
     hLayout->addWidget(registerBtn_);
+    hLayout->addStretch();
+
+
+    // 总布局
+    auto layout = new QVBoxLayout;
+
+    layout->setSpacing(15);
+    layout->setContentsMargins(30, 30, 30, 30);
+
+    layout->addLayout(usernameLayout);
+    layout->addLayout(passwordLayout);
     layout->addLayout(hLayout);
+
 
     setLayout(layout);
 
@@ -39,6 +92,7 @@ LoginDialog::LoginDialog(std::shared_ptr<IMClientWrapper> wrapper, QWidget* pare
     connect(wrapper_.get(), &IMClientWrapper::loginResult, this, &LoginDialog::onLoginResult);
     connect(wrapper_.get(), &IMClientWrapper::registerResult, this, &LoginDialog::onRegisterResult);
 }
+
 void LoginDialog::onRegisterResult(bool success, int status, const QString& errorMsg) {
     // 恢复按钮点击
     loginBtn_->setEnabled(true);

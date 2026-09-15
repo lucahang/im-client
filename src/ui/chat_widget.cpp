@@ -2,6 +2,7 @@
 #include "imclientwrapper.h"
 #include "message_model.h"
 
+#include <QUuid>
 #include <QVBoxLayout>
 #include <QQuickWidget>
 #include <QQmlContext>
@@ -55,6 +56,9 @@ ChatWidget::ChatWidget(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(quickWidget_);
+    
+    connect(wrapper_.get(), &IMClientWrapper::messageAck,
+        this, &ChatWidget::onMessageAck);
 }
 
 void ChatWidget::setPeer(const QString& peerId, bool isGroup) {
@@ -63,9 +67,17 @@ void ChatWidget::setPeer(const QString& peerId, bool isGroup) {
     messageModel_->clear();
 }
 
-void ChatWidget::displayMessage(const QString& msg, bool isSelf) {
-    messageModel_->appendMessage(msg, isSelf);
+void ChatWidget::displayMessage(const QString& msg, const QString& msg_unique_id, 
+                                bool isSelf, int32_t status) {
+    messageModel_->appendMessage(msg, msg_unique_id, isSelf, status);
 }
+
+void ChatWidget::onMessageAck(const QString& peer_id, const QString& msg_unique_id, 
+                              int32_t status){
+    qDebug()<<"msg_unique_id: "<<msg_unique_id;
+    messageModel_->setMsgStatus(peer_id, msg_unique_id, status);
+}
+
 
 void ChatWidget::displayMessages(const QList<QPair<QString, QString>>& msgs) {
     messageModel_->setMessages(msgs);
@@ -83,6 +95,8 @@ void ChatWidget::onSendMessageRequested(const QString& content) {
     qDebug()<<"onSendMessageRequested function runs";
     if (content.isEmpty() || currentPeer_.isEmpty()) return;
 
-    wrapper_->doSendMessage(currentPeer_, content, currentIsGroup_);
-    displayMessage(content, true); // 自己发送的消息, isSelf = true
+    QString messageId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+    wrapper_->doSendMessage(currentPeer_, content, currentIsGroup_, messageId);
+    displayMessage(content, messageId, true, 0); // 自己发送的消息, isSelf = true
 }

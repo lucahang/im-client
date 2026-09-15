@@ -13,13 +13,14 @@ public:
     explicit ChatWidget(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent = nullptr);
 
     void setPeer(const QString& peerId, bool isGroup);
-    void displayMessage(const QString& msg, bool isSelf = false);
+    void displayMessage(const QString& msg, const QString& msg_unique_id,
+                        bool isSelf = false, int32_t status = 0);
     void displayMessages(const QList<QPair<QString, QString>>& msgs);
 
 private slots:
     void onSendMessageRequested(const QString& content);
     void onLoadMoreHistoryRequested(const int & cnt);
-
+    void onMessageAck(const QString& peer_id, const QString& msg_unique_id, int32_t status);
 private:
     std::shared_ptr<IMClientWrapper> wrapper_;
     MessageModel* messageModel_ = nullptr;

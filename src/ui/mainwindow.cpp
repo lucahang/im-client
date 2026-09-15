@@ -161,7 +161,8 @@ void MainWindow::onContactsReceived(const QList<QPair<QString, QString>>& contac
     }
 }
 
-void MainWindow::onMessageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId) {
+void MainWindow::onMessageReceived(const QString& sender, const QString& content, bool isGroup,
+                                   const QString& groupId, const QString& msg_id) {
     QString peerId = isGroup ? groupId : sender;
     QString display = QString("%1").arg(content);
     messageCache_[peerId].append({display, sender});
@@ -172,7 +173,7 @@ void MainWindow::onMessageReceived(const QString& sender, const QString& content
     // 如果当前选中的就是这个联系人，则更新聊天显示
     if (currentPeer_ == peerId && currentIsGroup_ == isGroup) {
         //qDebug()<<"update display...";
-        chatWidget_->displayMessage(display);
+        chatWidget_->displayMessage(display, msg_id);
     }
 }
 

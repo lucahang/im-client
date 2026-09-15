@@ -17,7 +17,8 @@ public:
     // 供 GUI 调用的接口（线程安全，内部会投递到 io_context）
     void doRegister(const QString& username, const QString& password);
     void doLogin(const QString& username, const QString& password);
-    void doSendMessage(const QString& receiverId, const QString& content, bool isGroup);
+    void doSendMessage(const QString& receiverId, const QString& content, 
+                       bool isGroup, const QString& msg_unique_id);
     void doSendAddFriendReq(const QString& target_name, const QString& sender_name, const QString& msg);
     void doGetContacts();
     void doDeleteFriendReq(const QString& peer_id);
@@ -38,7 +39,8 @@ signals:
     void registerResult(bool success, int status, const QString& message);
     void loginResult(bool success, int status, const QString& userId, const QString& username);
     void contactsReceived(const QList<QPair<QString, QString>>& contacts, const QList<bool>& isGroup);
-    void messageReceived(const QString& sender, const QString& content, bool isGroup, const QString& groupId);
+    void messageReceived(const QString& sender, const QString& content, bool isGroup, 
+                         const QString& groupId, const QString& msg_id);
     void historyReceived(const QList<QPair<QString,QString>>& messages);   // 实际可定义结构
     void loadMoreHistoryReceived(const QList<QPair<QString,QString>>& messages);   // 实际可定义结构
     void deleteFriendReceive(const int32_t status);
@@ -47,6 +49,7 @@ signals:
     void errorOccurred(const QString& error);
     void clickReceive(const int32_t status);    //click on friend requests 
     // void sendGetFriendReqsReq();
+    void messageAck(const QString& peer_id, const QString& msg_unique_id, int32_t status);
     void friendReqsReceived(const QList<QVector<QString>>& messages);
 
 private slots:

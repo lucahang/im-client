@@ -22,7 +22,7 @@ Item {
             Layout.fillHeight: true
             clip: true
             model: messageModel // C++ 端设置的 Context Property
-            spacing: 8
+            spacing: 30
 
             property int lastCount: 0
             property bool isLoadingMore: false
@@ -69,7 +69,7 @@ Item {
 
             delegate: Rectangle {
                 width: listView.width
-                height: contentText.implicitHeight + 16
+                height: contentText.implicitHeight + 36
                 color: "transparent"
 
                 Rectangle {
@@ -91,9 +91,42 @@ Item {
                         text: model.content
                         wrapMode: Text.Wrap
                         verticalAlignment: Text.AlignVCenter
-                        font.pixelSize: 14
+                        font.pixelSize: 20
+                    }
+
+                    Text {
+                        id: statusText
+
+                        anchors.left: parent.left
+                        anchors.top: parent.bottom
+
+                        anchors.rightMargin: 8
+                        anchors.bottomMargin: 4
+
+
+                        text: {
+                            if (model.isSelf) {
+                                if(model.status == 1){
+                                    return "sent"
+                                }
+                                else if(model.status == 0){
+                                    return "sending"
+                                }
+                            } else {
+                                return ""
+                            }
+                        }
+
+
+                        font.pixelSize: 15
+                        //font.bold: true
+                        color: "#1d1c22"
                     }
                 }
+            }
+            footer: Item {
+                width: listView.width
+                height: 30
             }
         } // <--- 修复：删除了底部多余的 onCountChanged 重复块
 

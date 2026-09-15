@@ -88,7 +88,8 @@ void IMClient::LoginUser(const std::string& username, const std::string& passwor
     Send(msg);
 }
 
-void IMClient::SendSingleMsg(const std::string& receiver, const std::string& content) {
+void IMClient::SendSingleMsg(const std::string& receiver, const std::string& content,
+                             const std::string& msg_unique_id) {
     if (!currentUserId_) { std::cerr << "Not logged in\n"; return; }
     im::Message msg;
     msg.mutable_header()->set_cmd(im::CMD_SINGLE_MSG);
@@ -96,12 +97,14 @@ void IMClient::SendSingleMsg(const std::string& receiver, const std::string& con
     im::ChatMessage chat;
     chat.set_sender(*currentUserId_);
     chat.set_receiver(receiver);
+    chat.set_msg_unique_id(msg_unique_id);
     chat.set_content(content);
     msg.set_body(chat.SerializeAsString());
     Send(msg);
 }
 
-void IMClient::SendGroupMsg(const std::string& group_id, const std::string& content) {
+void IMClient::SendGroupMsg(const std::string& group_id, const std::string& content,
+                            const std::string& msg_unique_id) {
     if (!currentUserId_) { std::cerr << "Not logged in\n"; return; }
     im::Message msg;
     msg.mutable_header()->set_cmd(im::CMD_GROUP_MSG);
@@ -109,6 +112,7 @@ void IMClient::SendGroupMsg(const std::string& group_id, const std::string& cont
     im::ChatMessage chat;
     chat.set_group_id(group_id);
     chat.set_content(content);
+    chat.set_msg_unique_id(msg_unique_id);
     msg.set_body(chat.SerializeAsString());
     Send(msg);
 }

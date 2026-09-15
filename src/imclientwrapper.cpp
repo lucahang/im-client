@@ -96,14 +96,16 @@ void IMClientWrapper::doSendAddFriendReq(const QString& target_name, const QStri
     });
 }
 
-void IMClientWrapper::doSendMessage(const QString& receiverId, const QString& content, bool isGroup) {
+void IMClientWrapper::doSendMessage(const QString& receiverId, const QString& content, 
+                                    bool isGroup, const QString& msg_unique_id) {
     std::string rid = receiverId.toStdString();
     std::string cnt = content.toStdString();
-    boost::asio::post(ioc_, [this, rid, cnt, isGroup]() {
+    std::string msg_id = msg_unique_id.toStdString();
+    boost::asio::post(ioc_, [this, rid, cnt, isGroup, msg_id]() {
         if (isGroup)
-            client_->SendGroupMsg(rid, cnt);
+            client_->SendGroupMsg(rid, cnt, msg_id);
         else
-            client_->SendSingleMsg(rid, cnt);
+            client_->SendSingleMsg(rid, cnt, msg_id);
     });
 }
 
@@ -202,6 +204,17 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
             }
             break;
         }
+        case im::CMD_MESSAGE_ACK:{
+            im::MessageACK ack;
+            qDebug()<<"receive CMD_MESSAGE_ACK";
+            if (ack.ParseFromString(msg.body())) {
+                QString peer_id = QString::fromStdString(ack.peer_id());
+                int32_t status = ack.status();// status == 1 接收到
+                QString msg_unique_id = QString::fromStdString(ack.msg_unique_id());
+                emit messageAck(peer_id, msg_unique_id, status);
+            }
+            break;
+        }
         case im::CMD_SINGLE_MSG:{
             im::ChatMessage chat;
             if (chat.ParseFromString(msg.body())) {
@@ -210,10 +223,11 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
                 bool isGroup = (cmd == im::CMD_GROUP_MSG);
                 QString groupId = "";
                 qDebug() << "receive CMD_SINGLE_MSG";
-                emit messageReceived(sender, content, isGroup, groupId);
+                emit messageReceived(sender, content, isGroup, groupId, "");
             }
             break;
         }
+        
         case im::CMD_GROUP_MSG: {
             im::ChatMessage chat;
             if (chat.ParseFromString(msg.body())) {
@@ -221,7 +235,7 @@ void IMClientWrapper::onNetworkMessage(const im::Message& msg) {
                 QString content = QString::fromStdString(chat.content());
                 bool isGroup = (cmd == im::CMD_GROUP_MSG);
                 QString groupId = isGroup ? QString::fromStdString(chat.group_id()) : "";
-                emit messageReceived(sender, content, isGroup, groupId);
+                emit messageReceived(sender, content, isGroup, groupId, "");
             }
             break;
         }
