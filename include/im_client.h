@@ -23,6 +23,7 @@ public:
              ReceiveCallback onRecv);
 
     void Connect();
+    bool IsConnected(){return isConnected_;}
     void Send(const im::Message& msg);
 
     // 高级接口
@@ -64,7 +65,7 @@ private:
     std::deque<std::string> sendQueue_;
     std::mutex sendMutex_;
     bool writing_ = false;
-
+    bool isConnected_ = false;
     int64_t seq_ = 0;
     std::optional<std::string> currentUserId_;
     mutable std::mutex userIdMutex_;

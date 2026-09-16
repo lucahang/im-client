@@ -14,10 +14,24 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         spacing: 8
+        
 
+        Timer {
+            id: scrollTimer
+
+            interval: 50
+
+            onTriggered: {
+                listView.positionViewAtEnd()
+            }
+        }
         // 消息展示列表
         ListView {
             id: listView
+
+            property bool firstLoad: true
+
+
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
@@ -29,10 +43,17 @@ Item {
             
             // 1. 数据增加时，延迟一帧滚动到底部（等待 Delegate 尺寸计算完毕）
             onCountChanged: {
+                //console.log("model.peerName: {}" + model.peerName) 
+                if (firstLoad && count > 0) {
+                    firstLoad = false
+                    scrollTimer.start()
+                }
+
                 if(count == lastCount+1){
-                    Qt.callLater(function() {
-                        listView.positionViewAtEnd()
-                    })
+                    scrollTimer.start()
+                }
+                if(count == 0 ){
+                    firstLoad = true
                 }
                 lastCount = count
             }
@@ -71,17 +92,58 @@ Item {
                 width: listView.width
                 height: contentText.implicitHeight + 36
                 color: "transparent"
-
+                
+                //avatar
                 Rectangle {
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    // 区分发送者与接收者的左右靠齐（通过 isSelf）
-                    anchors.right: model.isSelf ? parent.right : undefined
-                    anchors.left: model.isSelf ? undefined : parent.left
-                    anchors.margins: 8
+                    id: avatar
 
-                    width: Math.min(contentText.implicitWidth + 24, listView.width * 0.7)
+                    width: 40
+                    height: 40
+
+                    anchors.top: parent.top
+                    anchors.topMargin: 8
+
+                    anchors.left: model.isSelf ? undefined : parent.left
+                    anchors.right: model.isSelf ? parent.right : undefined
+
+                    anchors.leftMargin: 8
+                    anchors.rightMargin: 8
+
+                    color: "#cccccc"
+                    radius: 6
+
+                    Text {
+                        anchors.centerIn: parent
+                        // 这里改成你的用户名字段
+                        text: model.isSelf
+                            ? "me"
+                            : model.peerName;
+
+                        font.pixelSize: 12
+                        color: "#333333"
+                    }
+                }
+                
+                //message
+                Rectangle {
+                    id: messageBubble
+
+                    anchors.top: parent.top
+                    anchors.topMargin: 8
+
+                    anchors.bottom: parent.bottom
+
+                    // 对方消息：头像右边开始
+                    anchors.left: model.isSelf ? undefined : avatar.right
+
+                    // 自己消息：头像左边结束
+                    anchors.right: model.isSelf ? avatar.left : undefined
+                    anchors.leftMargin: 10
+                    anchors.rightMargin: 10
+
+                    width: Math.min(contentText.implicitWidth + 24, listView.width * 0.65)
                     color: model.isSelf ? "#95ec69" : "#d7c8c894"
+                    height: contentText.implicitHeight + 16
                     radius: 6
 
                     Text {

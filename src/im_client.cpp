@@ -42,9 +42,12 @@ void IMClient::Connect() {
                                  boost::asio::ip::tcp::endpoint) {
                         if (!ec) {
                             std::cout << "Connected to server." << std::endl;
+                            isConnected_ = true;
                             AsyncReadLength();
                         } else {
                             std::cerr << "Connect failed: " << ec.message() << std::endl;
+                            boost::system::error_code close_ec;
+                            socket_.close(close_ec);
                         }
                     });
             } else {

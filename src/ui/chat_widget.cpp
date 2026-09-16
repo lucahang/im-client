@@ -61,15 +61,17 @@ ChatWidget::ChatWidget(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent
         this, &ChatWidget::onMessageAck);
 }
 
-void ChatWidget::setPeer(const QString& peerId, bool isGroup) {
+void ChatWidget::setPeer(const QString& peerId, bool isGroup, const QString& peerName) {
     currentPeer_ = peerId;
     currentIsGroup_ = isGroup;
+    currentPeerName_ = peerName;
+    messageModel_->setPeerName(peerName);
     messageModel_->clear();
 }
 
 void ChatWidget::displayMessage(const QString& msg, const QString& msg_unique_id, 
                                 bool isSelf, int32_t status) {
-    messageModel_->appendMessage(msg, msg_unique_id, isSelf, status);
+    messageModel_->appendMessage(msg, msg_unique_id, isSelf, status, currentPeerName_);
 }
 
 void ChatWidget::onMessageAck(const QString& peer_id, const QString& msg_unique_id, 

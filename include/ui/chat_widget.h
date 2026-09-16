@@ -12,7 +12,7 @@ class ChatWidget : public QWidget {
 public:
     explicit ChatWidget(std::shared_ptr<IMClientWrapper> wrapper, QWidget* parent = nullptr);
 
-    void setPeer(const QString& peerId, bool isGroup);
+    void setPeer(const QString& peerId, bool isGroup, const QString& peerName);
     void displayMessage(const QString& msg, const QString& msg_unique_id,
                         bool isSelf = false, int32_t status = 0);
     void displayMessages(const QList<QPair<QString, QString>>& msgs);
@@ -27,5 +27,6 @@ private:
     QQuickWidget* quickWidget_ = nullptr;
 
     QString currentPeer_;
+    QString currentPeerName_;
     bool currentIsGroup_ = false;
 };

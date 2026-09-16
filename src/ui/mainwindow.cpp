@@ -156,6 +156,7 @@ void MainWindow::onContactsReceived(const QList<QPair<QString, QString>>& contac
         auto item = new QListWidgetItem(displayName + (isGroup[i] ? " (Group)" : ""));
         item->setData(Qt::UserRole, contacts[i].first);   // 存储 ID
         item->setData(Qt::UserRole + 1, isGroup[i]);
+        item->setData(Qt::UserRole + 2, contacts[i].second);
         item->setBackground(QBrush(QColor(200, 200, 200)));
         contactList_->addItem(item);
     }
@@ -201,10 +202,11 @@ void MainWindow::onLoadMoreHistoryReceived(const QList<QPair<QString, QString>>&
 void MainWindow::onContactClicked(QListWidgetItem* item) {
     QString peerId = item->data(Qt::UserRole).toString();
     bool isGroup = item->data(Qt::UserRole + 1).toBool();
+    QString peerName = item->data(Qt::UserRole + 2).toString();
     currentPeer_ = peerId;
     currentIsGroup_ = isGroup;
-
-    chatWidget_->setPeer(peerId, isGroup);
+    // qDebug()<<"peerName: "<<peerName;
+    chatWidget_->setPeer(peerId, isGroup, peerName);
     chatWidget_->setEnabled(true);
 
     // // 如果有缓存消息，显示；否则请求历史（默认获取最近20条）

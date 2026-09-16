@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-MessageModel::MessageModel(QObject* parent, std::shared_ptr<IMClientWrapper> wrapper ) 
+MessageModel::MessageModel(QObject* parent, std::shared_ptr<IMClientWrapper> wrapper) 
         : QAbstractListModel(parent),  wrapper_(wrapper){
     currentUserId_ = wrapper_->getCurrentUserId();
 }
@@ -17,6 +17,10 @@ QVariant MessageModel::data(const QModelIndex& index, int role) const {
         return QVariant();
 
     const auto& item = messages_.at(index.row());
+    QString pname = peerName_;
+    if(pname.length()>5){
+        pname= peerName_.left(5)+"···";
+    }
     switch (role) {
     case ContentRole:
         return item.content;
@@ -26,6 +30,8 @@ QVariant MessageModel::data(const QModelIndex& index, int role) const {
         return static_cast<int>(item.status);
     case MessageIdRole:
         return item.msg_id;
+    case PeerNameRole:
+        return pname;
     default:
         return QVariant();
     }
@@ -37,14 +43,15 @@ QHash<int, QByteArray> MessageModel::roleNames() const {
     roles[IsSelfRole] = "isSelf";
     roles[StatusRole] = "status";
     roles[MessageIdRole] = "msg_id";
+    roles[PeerNameRole] = "peerName";
     return roles;
 }
 
 void MessageModel::appendMessage(const QString& msg, const QString& msg_unique_id, 
-                                 bool isSelf, int32_t status) {
+                                 bool isSelf, int32_t status, const QString& peerName) {
     beginInsertRows(QModelIndex(), messages_.size(), messages_.size());
     
-    messages_.append({msg, isSelf, status, msg_unique_id});
+    messages_.append({msg, isSelf, status, msg_unique_id, peerName});
     endInsertRows();
 }
 
@@ -73,7 +80,7 @@ void MessageModel::setMessages(const QList<QPair<QString, QString>>& msgs) {
 
     for (int i = msgs.size() - 1; i >= 0; --i) {
         bool isSelf = (!currentUid.isEmpty() && msgs.at(i).second == currentUid);
-        messages_.append({msgs.at(i).first, isSelf, 1});
+        messages_.append({msgs.at(i).first, isSelf, 1, msgs.at(i).second});
     }
     endResetModel();
 }
